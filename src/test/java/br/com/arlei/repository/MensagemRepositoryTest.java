@@ -21,21 +21,25 @@ import static org.mockito.Mockito.*;
 public class MensagemRepositoryTest  {
 
 
+    // Mockito que cria os Fakes
     @Mock
     private MensagemRepository mensagemRepository;
 
     AutoCloseable openMocks;
 
+    /// Antes de cada execução, cria um novo mock , fake, ou seja inicia todas as variaves que tem a anotação Mock
     @BeforeEach
     void setup(){
         openMocks = MockitoAnnotations.openMocks(this);
     }
 
+    // Após cada execução...
     @AfterEach
     void tearDown() throws Exception{
         openMocks.close();
     }
 
+    // JUNIT
     @Test
     void devePermitirRegistrarMensagem(){
         //Triple A
@@ -44,6 +48,7 @@ public class MensagemRepositoryTest  {
 
         var mensagem = gerarMensagem();
 
+        // do mockito, quando passamos a classe deixamos bem generica que e a classe
         when(mensagemRepository.save(any(Mensagem.class))).thenReturn(mensagem);
 
         //Act -- executa
@@ -53,7 +58,8 @@ public class MensagemRepositoryTest  {
         // Assert -- verifica
         assertThat(mensagemArmazenada).isNotNull().isEqualTo(mensagem);
 
-        // garanto que tive uma chamada a banco de dados... q
+        // garanto que tive uma chamada a banco de dados...  do mockito... no sabe para deixa generico poderia usar Mensagem.class com Any()
+        // e o que chamamos de spy
         verify(mensagemRepository, times(1)).save(mensagem);
 
 
@@ -66,6 +72,7 @@ public class MensagemRepositoryTest  {
 
         // Arrange
         var id = UUID.randomUUID();
+        // metodo do Mockito....
         doNothing().when(mensagemRepository).deleteById(any(UUID.class));
         // Act
         mensagemRepository.deleteById(id);

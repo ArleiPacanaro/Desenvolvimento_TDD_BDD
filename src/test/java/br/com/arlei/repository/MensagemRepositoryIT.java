@@ -25,6 +25,7 @@ public class MensagemRepositoryIT {
    void devePermitirCriarTabela(){
        var totalDeRegistro = mensagemRepository.count();
        assertThat(totalDeRegistro).isNotNegative();
+       // fail usar do Junit mas tem do assertj
 
    }
 
@@ -44,6 +45,7 @@ public class MensagemRepositoryIT {
 
         //Assert
 
+        /// AssertJ     '
         assertThat(mensagemRecebida)
                 .isInstanceOf(Mensagem.class)
                         .isNotNull();
@@ -90,7 +92,7 @@ public class MensagemRepositoryIT {
     @Test
     void devePermitirBuscarMensagem(){
 
-       /* comentamos, pois vamos usar a mensgem criada via script, caso fosse pelo nosso insert o, tirar os comentarios
+       /* comentamos, pois vamos usar a mensagem criada via script, caso fosse pelo nosso insert o, tirar os comentarios
        var id = UUID.randomUUID();
        var mensagem = gerarMensagem();
        mensagem.setId(id);
@@ -104,9 +106,11 @@ public class MensagemRepositoryIT {
         Optional<Mensagem> mensagemRecebidaOpcional = mensagemRepository.findById(id);
 
         // Assert
+        /// validamos se existe conteudo
         assertThat(mensagemRecebidaOpcional).isPresent();
 
 
+        // Validamos o conteudo
         mensagemRecebidaOpcional.ifPresent( mensagemRecebida -> {
             assertThat(mensagemRecebida.getId()).isEqualTo(id);
             //assertThat(mensagemRecebida.getConteudo()).isEqualTo(mensagem.getConteudo());
