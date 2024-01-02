@@ -1,6 +1,7 @@
 package br.com.arlei.repository;
 
 import br.com.arlei.model.Mensagem;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,9 +13,10 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-// Ja a classe para interagir com o baoc de dados...
+// Ja a classe para interagir com o banco de dados...
 @SpringBootTest
 @AutoConfigureTestDatabase
+@Transactional
 public class MensagemRepositoryIT {
 
    @Autowired
@@ -30,8 +32,7 @@ public class MensagemRepositoryIT {
    }
 
 
-
-    @Test
+   @Test
     void devePermitirRegistrarMensagem(){
 
        //Arrange
@@ -52,9 +53,6 @@ public class MensagemRepositoryIT {
         assertThat(mensagemRecebida.getId()).isEqualTo(mensagem.getId());
         assertThat(mensagemRecebida.getConteudo()).isEqualTo(mensagem.getConteudo());
         assertThat(mensagemRecebida.getUsuario()).isEqualTo(mensagem.getUsuario());
-
-
-
 
         //fail("teste não implementado");
 
@@ -77,7 +75,7 @@ public class MensagemRepositoryIT {
        // fail("teste não implementado");
     }
 
-    @Test
+   @Test
     void devePermitirListarMensagem(){
        //Act
        var resultadosObtidos = mensagemRepository.findAll();
@@ -117,16 +115,12 @@ public class MensagemRepositoryIT {
             //assertThat(mensagemRecebida.getUsuario()).isEqualTo(mensagem.getUsuario());
         });
 
-
-
         //fail("teste não implementado");
 
     }
 
     private Mensagem registrarMensagem(Mensagem mensagem){
-
        return mensagemRepository.save(mensagem);
-
     }
 
     private Mensagem gerarMensagem(){

@@ -4,6 +4,9 @@ import br.com.arlei.exception.MensagemNotFoundException;
 import br.com.arlei.model.Mensagem;
 import br.com.arlei.repository.MensagemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -11,6 +14,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class MensagemServiceImpl implements MensagemService{
+
+
 
     private final MensagemRepository mensagemRepository;
 
@@ -38,6 +43,13 @@ public class MensagemServiceImpl implements MensagemService{
 
     @Override
     public Boolean removerMensagem(UUID id) {
-        return null;
+        var mensagem = buscarMensagem(id);
+        mensagemRepository.deleteById(id);
+        return true;
     }
+
+  @Override
+  public Page<Mensagem> listarMensagens(Pageable page) {
+     return mensagemRepository.listarMensagens(page);
+ }
 }

@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -137,6 +136,7 @@ public class MensagemRepositoryTest  {
            assertThat(mensagensRecebidas)
                    .hasSize(2)
                    .containsExactlyInAnyOrder(mensagem1,mensagem2);
+
 
     }
 

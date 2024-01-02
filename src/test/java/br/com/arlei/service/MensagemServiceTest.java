@@ -1,35 +1,34 @@
-package service;
+package br.com.arlei.service;
 
 import br.com.arlei.exception.MensagemNotFoundException;
 import br.com.arlei.model.Mensagem;
 import br.com.arlei.repository.MensagemRepository;
-import br.com.arlei.service.MensagemService;
-import br.com.arlei.service.MensagemServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 
 class MensagemServiceTest {
 
+    // Trabalhar com Fake - Mockito.
+    AutoCloseable mock;
     private MensagemService mensagemService;
-
     @Mock
     private  MensagemRepository mensagemRepository;
 
-    // Trabalhar com Fake - Mockito.
-    AutoCloseable mock;
     @BeforeEach  // antes de cada teste
     void setup(){
 
@@ -120,7 +119,7 @@ class MensagemServiceTest {
        var mensagemNova = new Mensagem();
        mensagemNova.setId(mensagemAntigo.getId());
        mensagemNova.setUsuario(mensagemAntigo.getUsuario());
-       mensagemNova.setDataCriacaoMensagem(mensagemAntigo.getDataCriacaoMensagem());
+       mensagemNova.setDataCriacao(mensagemAntigo.getDataCriacao());
        mensagemNova.setGostei(mensagemAntigo.getGostei());
        mensagemNova.setConteudo("ABCD 12345");
 
@@ -146,14 +145,89 @@ class MensagemServiceTest {
 
     }
 
+    //devePermitirRemoverMensagem
+
+    @Test
+    void deveGerarExcecao_QuandoAlterarMensagem_IdDaMensagemNovaApresentaValorDiferente(){
+
+        //Arrange
+        var id = UUID.randomUUID();
+        var mensagemAntiga =gerarMensagem();
+        mensagemAntiga.setId(id);
+        var mensagemNova = gerarMensagem();
+        mensagemNova.setId(UUID.randomUUID());
+        mensagemNova.setConteudo("ABC 12345");
+
+        when(mensagemRepository.findById(id)).thenReturn(Optional.of(mensagemAntiga));
+
+        //Act e Assert
+        assertThatThrownBy(()-> mensagemService.alterarMensagem(id,mensagemNova))
+                .isInstanceOf(MensagemNotFoundException.class)
+                .hasMessage("mensagem atualizada não apresenta o ID correto");
+        verify(mensagemRepository,times(1)).findById(any(UUID.class));
+        verify(mensagemRepository,never()).save(any(Mensagem.class));
+
+
+    }
+
     @Test
     void devePermitirRemoverMensagem(){
-        fail("Teste não implementado");
+        // Arrange
+        var id = UUID.fromString("e0b73fc9-cca5-4173-bb0d-1d7813984f3f");
+        var mensagem = gerarMensagem();
+        mensagem.setId(id);
+        when(mensagemRepository.findById(id)).thenReturn(Optional.of(mensagem));
+        doNothing().when(mensagemRepository).deleteById(id);
+        //Act
+        var mensagemFoiRemovida = mensagemService.removerMensagem(id);
+        //Assert
+        assertThat(mensagemFoiRemovida).isTrue();
+        verify(mensagemRepository,times(1)).findById(any(UUID.class));
+        verify(mensagemRepository,times(1)).deleteById(any(UUID.class));
+
+
+        //fail("Teste não implementado");
+    }
+
+    @Test
+    void deveGerarExcecao_QuandoRemoverMensagem_IdNaoExiste(){
+
+        // Arrange
+        var id = UUID.fromString("e0b73fc9-cca5-4173-bb0d-1d7813984f4f");
+        when(mensagemRepository.findById(id)).thenReturn(Optional.empty());
+       // Act e Assert
+        assertThatThrownBy(()-> mensagemService.removerMensagem(id) )
+                .isInstanceOf(MensagemNotFoundException.class)
+                .hasMessage("Mensagem não encontrada");
+        verify(mensagemRepository,times(1)).findById(any(UUID.class));
+        verify(mensagemRepository,never()).deleteById(any(UUID.class));
+
+
     }
 
     @Test
     void devePermitirListarMensagens(){
-        fail("Teste não implementado");
+       // Arrange
+        Page<Mensagem> listaDeMensagens = new  org.springframework.data.domain.PageImpl<>(Arrays.asList(
+                gerarMensagem(),
+                gerarMensagem()
+        ));
+        when(mensagemRepository.listarMensagens(any(Pageable.class)))
+                .thenReturn(listaDeMensagens);
+
+        // Action
+        var resultadoObtido = mensagemService.listarMensagens(Pageable.unpaged());
+
+        // Assert
+        assertThat(resultadoObtido).hasSize(2);
+        assertThat(resultadoObtido.getContent()).asList()
+                .allSatisfy( mensagem -> {
+                    assertThat(mensagem)
+                            .isNotNull()
+                            .isInstanceOf(Mensagem.class);
+                        } );
+        verify(mensagemRepository,times(1)).listarMensagens(any(Pageable.class));
+
     }
 
     private Mensagem gerarMensagem(){
