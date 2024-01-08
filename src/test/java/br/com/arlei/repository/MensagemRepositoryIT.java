@@ -1,6 +1,7 @@
 package br.com.arlei.repository;
 
 import br.com.arlei.model.Mensagem;
+import br.com.arlei.utils.MensagemHelper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.fail;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @Transactional
-public class MensagemRepositoryIT {
+class MensagemRepositoryIT {
 
    @Autowired
    private MensagemRepository mensagemRepository;
@@ -38,7 +39,7 @@ public class MensagemRepositoryIT {
        //Arrange
 
        var id = UUID.randomUUID();
-       var mensagem = gerarMensagem();
+       var mensagem = MensagemHelper.gerarMensagem();
        mensagem.setId(id);
 
        //Act
@@ -123,14 +124,6 @@ public class MensagemRepositoryIT {
        return mensagemRepository.save(mensagem);
     }
 
-    private Mensagem gerarMensagem(){
-        // ja gera como registro do banco de dados...
-        return Mensagem.builder()
-                .id(UUID.randomUUID())
-                .usuario("Jose")
-                .conteudo("conteudo da mensagem")
-                .build();
 
-    }
 
 }

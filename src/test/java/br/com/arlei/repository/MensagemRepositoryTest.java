@@ -2,6 +2,7 @@ package br.com.arlei.repository;
 
 
 import br.com.arlei.model.Mensagem;
+import br.com.arlei.utils.MensagemHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Mockito.*;
 
-public class MensagemRepositoryTest  {
+class MensagemRepositoryTest  {
 
 
     // Mockito que cria os Fakes
@@ -45,7 +46,7 @@ public class MensagemRepositoryTest  {
 
         // Arrange prepara
 
-        var mensagem = gerarMensagem();
+        var mensagem = MensagemHelper.gerarMensagem();
 
         // do mockito, quando passamos a classe deixamos bem generica que e a classe
         when(mensagemRepository.save(any(Mensagem.class))).thenReturn(mensagem);
@@ -87,7 +88,7 @@ public class MensagemRepositoryTest  {
 
         //arrange
         var id = UUID.randomUUID();
-        var mensagem = gerarMensagem();
+        var mensagem = MensagemHelper.gerarMensagem();
         mensagem.setId(id);
 
         when(mensagemRepository.findById(any(UUID.class)))
@@ -119,8 +120,8 @@ public class MensagemRepositoryTest  {
     void devePermitirListarMensagens(){
 
         // Arrange
-        var mensagem1 = gerarMensagem();
-        var mensagem2 = gerarMensagem();
+        var mensagem1 = MensagemHelper.gerarMensagem();
+        var mensagem2 = MensagemHelper.gerarMensagem();
 
         var listaMensagens = Arrays.asList(
           mensagem1,
@@ -137,16 +138,6 @@ public class MensagemRepositoryTest  {
                    .hasSize(2)
                    .containsExactlyInAnyOrder(mensagem1,mensagem2);
 
-
-    }
-
-    private Mensagem gerarMensagem(){
-        // ja gera como registro do banco de dados...
-        return Mensagem.builder()
-                .id(UUID.randomUUID())
-                .usuario("Jose")
-                .conteudo("conteudo da mensagem")
-                .build();
 
     }
 

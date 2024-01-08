@@ -3,6 +3,7 @@ package br.com.arlei.service;
 import br.com.arlei.exception.MensagemNotFoundException;
 import br.com.arlei.model.Mensagem;
 import br.com.arlei.repository.MensagemRepository;
+import br.com.arlei.utils.MensagemHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,11 +44,11 @@ class MensagemServiceTest {
     }
 
     @Test
-    public void devePermitirRegistrarMensagem()
+    void devePermitirRegistrarMensagem()
     {
         // conceito do triple A
         // Arrange
-        var mensagem = gerarMensagem();
+        var mensagem = MensagemHelper.gerarMensagem();
 
         // Mockito
         when(mensagemRepository.save(any(Mensagem.class)))
@@ -64,7 +65,6 @@ class MensagemServiceTest {
         assertThat(mensagem.getId()).isNotNull();
         verify(mensagemRepository,times(1)).save(any(Mensagem.class));
 
-
     }
 
 
@@ -73,7 +73,7 @@ class MensagemServiceTest {
         // conceito do triple A
         // Arrange
         var id = UUID.randomUUID();
-        var mensagem = gerarMensagem();
+        var mensagem = MensagemHelper.gerarMensagem();
         mensagem.setId(id);
 
         when(mensagemRepository.findById(any(UUID.class)))
@@ -86,7 +86,6 @@ class MensagemServiceTest {
 
         assertThat(mensagemObtida).isEqualTo(mensagem);
         verify(mensagemRepository,times(1)).findById(any(UUID.class));
-
 
     }
 
@@ -102,8 +101,6 @@ class MensagemServiceTest {
                 .hasMessage("Mensagem não encontrada");
 
         verify(mensagemRepository,times(1)).findById(id);
-
-
     }
 
     @Test
@@ -112,7 +109,7 @@ class MensagemServiceTest {
         // Arrange
        var id = UUID.randomUUID();
 
-       var mensagemAntigo = gerarMensagem();
+       var mensagemAntigo = MensagemHelper.gerarMensagem();
        mensagemAntigo.setId(id);
 
 
@@ -152,9 +149,9 @@ class MensagemServiceTest {
 
         //Arrange
         var id = UUID.randomUUID();
-        var mensagemAntiga =gerarMensagem();
+        var mensagemAntiga =MensagemHelper.gerarMensagem();
         mensagemAntiga.setId(id);
-        var mensagemNova = gerarMensagem();
+        var mensagemNova = MensagemHelper.gerarMensagem();
         mensagemNova.setId(UUID.randomUUID());
         mensagemNova.setConteudo("ABC 12345");
 
@@ -167,14 +164,13 @@ class MensagemServiceTest {
         verify(mensagemRepository,times(1)).findById(any(UUID.class));
         verify(mensagemRepository,never()).save(any(Mensagem.class));
 
-
     }
 
     @Test
     void devePermitirRemoverMensagem(){
         // Arrange
         var id = UUID.fromString("e0b73fc9-cca5-4173-bb0d-1d7813984f3f");
-        var mensagem = gerarMensagem();
+        var mensagem = MensagemHelper.gerarMensagem();
         mensagem.setId(id);
         when(mensagemRepository.findById(id)).thenReturn(Optional.of(mensagem));
         doNothing().when(mensagemRepository).deleteById(id);
@@ -209,8 +205,8 @@ class MensagemServiceTest {
     void devePermitirListarMensagens(){
        // Arrange
         Page<Mensagem> listaDeMensagens = new  org.springframework.data.domain.PageImpl<>(Arrays.asList(
-                gerarMensagem(),
-                gerarMensagem()
+                MensagemHelper.gerarMensagem(),
+                MensagemHelper.gerarMensagem()
         ));
         when(mensagemRepository.listarMensagens(any(Pageable.class)))
                 .thenReturn(listaDeMensagens);
@@ -230,13 +226,5 @@ class MensagemServiceTest {
 
     }
 
-    private Mensagem gerarMensagem(){
-        // ja gera como registro do banco de dados...
-        return Mensagem.builder()
-                .id(UUID.randomUUID())
-                .usuario("Jose")
-                .conteudo("conteudo da mensagem")
-                .build();
 
-    }
 }
