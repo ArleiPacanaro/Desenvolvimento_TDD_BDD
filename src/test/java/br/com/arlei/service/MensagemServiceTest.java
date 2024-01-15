@@ -106,38 +106,31 @@ class MensagemServiceTest {
     @Test
     void devePermitirAlterarMensagem(){
 
-        // Arrange
-       var id = UUID.randomUUID();
+        var id = UUID.randomUUID();
+        var mensagemAntiga = MensagemHelper.gerarMensagem();
+        mensagemAntiga.setId(id);
+        var mensagemNova = mensagemAntiga;
+        mensagemNova.setConteudo("abcd");
 
-       var mensagemAntigo = MensagemHelper.gerarMensagem();
-       mensagemAntigo.setId(id);
+        when(mensagemRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(mensagemAntiga));
 
+        when(mensagemRepository.save(any(Mensagem.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
-       var mensagemNova = new Mensagem();
-       mensagemNova.setId(mensagemAntigo.getId());
-       mensagemNova.setUsuario(mensagemAntigo.getUsuario());
-       mensagemNova.setDataCriacao(mensagemAntigo.getDataCriacao());
-       mensagemNova.setGostei(mensagemAntigo.getGostei());
-       mensagemNova.setConteudo("ABCD 12345");
+        var mensagemObtida = mensagemService
+                .alterarMensagem(id, mensagemNova);
 
-
-       when(mensagemRepository.findById(id))
-               .thenReturn(Optional.of(mensagemAntigo));
-
-       when(mensagemRepository.save(mensagemNova))
-               .thenAnswer(i-> i.getArgument(0));
-
-       // Act
-
-
-        var mensagemObtida = mensagemService.alterarMensagem(id,mensagemNova);
-
-        // Assert
-
-        assertThat(mensagemObtida.getId()).isEqualTo(mensagemAntigo.getId());
-
-        verify(mensagemRepository,times(1)).findById(any(UUID.class));
-        verify(mensagemRepository,times(1)).save(any(Mensagem.class));
+        assertThat(mensagemObtida)
+                .isInstanceOf(Mensagem.class)
+                .isNotNull();
+        assertThat(mensagemObtida.getId())
+                .isEqualTo(mensagemNova.getId());
+        assertThat(mensagemObtida.getUsuario())
+                .isEqualTo(mensagemNova.getUsuario());
+        assertThat(mensagemObtida.getConteudo())
+                .isEqualTo(mensagemNova.getConteudo());
+        verify(mensagemRepository, times(1)).save(any(Mensagem.class));
 
 
     }
@@ -160,7 +153,7 @@ class MensagemServiceTest {
         //Act e Assert
         assertThatThrownBy(()-> mensagemService.alterarMensagem(id,mensagemNova))
                 .isInstanceOf(MensagemNotFoundException.class)
-                .hasMessage("mensagem atualizada não apresenta o ID correto");
+                .hasMessage("mensagem não apresenta o ID correto");
         verify(mensagemRepository,times(1)).findById(any(UUID.class));
         verify(mensagemRepository,never()).save(any(Mensagem.class));
 
@@ -179,7 +172,7 @@ class MensagemServiceTest {
         //Assert
         assertThat(mensagemFoiRemovida).isTrue();
         verify(mensagemRepository,times(1)).findById(any(UUID.class));
-        verify(mensagemRepository,times(1)).deleteById(any(UUID.class));
+        verify(mensagemRepository,times(1)).delete(any(Mensagem.class));
 
 
         //fail("Teste não implementado");

@@ -11,11 +11,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -244,8 +249,24 @@ public class MensagemControllerTest {
     @Nested
     class ListarMensagem {
         @Test
-        void devePermitirListarMensagens() {
-            fail("Teste não implementado");
+        void devePermitirListarMensagens() throws Exception {
+
+            var mensagem = MensagemHelper.gerarMensagemCompleta();
+            Page<Mensagem> page = new PageImpl<>(Collections.singletonList(
+                    mensagem
+            ));
+            when(mensagemService.listarMensagens(any(Pageable.class)))
+                    .thenReturn(page);
+            mockMvc.perform(get("/mensagens")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[0].id").value(mensagem.getId().toString()))
+                    .andExpect(jsonPath("$.content[0].conteudo").value(mensagem.getConteudo()))
+                    .andExpect(jsonPath("$.content[0].usuario").value(mensagem.getUsuario()))
+                    .andExpect(jsonPath("$.content[0].dataCriacao").exists())
+                    .andExpect(jsonPath("$.content[0].gostei").exists());
+            verify(mensagemService, times(1))
+                    .listarMensagens(any(Pageable.class));
 
         }
     }

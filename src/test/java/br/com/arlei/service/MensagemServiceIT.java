@@ -148,7 +148,7 @@ class MensagemServiceIT {
             assertThatThrownBy(
                     () -> mensagemService.alterarMensagem(id, mensagemNova))
                     .isInstanceOf(MensagemNotFoundException.class)
-                    .hasMessage("mensagem atualizada não apresenta o ID correto");
+                    .hasMessage("mensagem não apresenta o ID correto");
             //    fail("Teste não implementado");
 
         }
@@ -171,7 +171,13 @@ class MensagemServiceIT {
         void deveGerarExcecao_QuandoRemoverMensagem_IdNaoExiste(){
 
 
-            fail("Teste não implementado");
+            var id = UUID.fromString("5f789b39-4295-42c1-a65b-cfca5b987db2");
+            var mensagemNova = MensagemHelper.gerarMensagemCompleta();
+
+            assertThatThrownBy(
+                    () -> mensagemService.alterarMensagem(id, mensagemNova))
+                    .isInstanceOf(MensagemNotFoundException.class)
+                    .hasMessage("Mensagem não encontrada");
 
         }
 

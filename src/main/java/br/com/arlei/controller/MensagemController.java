@@ -6,6 +6,9 @@ import br.com.arlei.model.Mensagem;
 import br.com.arlei.service.MensagemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +61,7 @@ public class MensagemController {
     try {
       var uuid = UUID.fromString(id);
       var mensagemAtualizada = mensagemService.alterarMensagem(uuid, mensagem);
-      return new ResponseEntity<>(mensagemAtualizada, HttpStatus.OK);
+      return new ResponseEntity<>(mensagemAtualizada, HttpStatus.ACCEPTED);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body("ID inválido");
     } catch (MensagemNotFoundException e) {
@@ -78,5 +81,15 @@ public class MensagemController {
     } catch (MensagemNotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+  }
+  @GetMapping(
+          value = "",
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Page<Mensagem>> listarMensagens(
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "10") int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<Mensagem> mensagens = mensagemService.listarMensagens(pageable);
+    return new ResponseEntity<>(mensagens, HttpStatus.OK);
   }
 }
