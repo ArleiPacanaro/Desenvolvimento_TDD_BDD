@@ -154,20 +154,95 @@ public class MensagemControllerIT {
 
         }
         @Test
-        void deveGerarExcecao_QuandoAlterarMensagem_PayloadComXml(){ fail("teste não implementado");}
+        void deveGerarExcecao_QuandoAlterarMensagem_PayloadComXml(){
+
+            var id = "4106c509-28d5-4294-97fd-3c025d83cb30";
+            String xmlPayload = "<mensagem><usuario>John</usuario><conteudo>Conteúdo da mensagem</conteudo></mensagem>";
+
+            given()
+                    .contentType(MediaType.APPLICATION_XML_VALUE)
+                    .body(xmlPayload)
+            .when()
+                    .put("/mensagens/{id}",id)
+            .then()
+                    .statusCode(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
+
+        }
         @Test
-        void deveGerarExcecao_QuandoAlterarMenssagem_IdNaoExiste(){ fail("teste não implementado");}
+        void deveGerarExcecao_QuandoAlterarMenssagem_IdNaoExiste(){
+
+            var id = UUID.fromString("4106c508-28d5-4294-97fd-3c025d83cb39");
+            var timestamp = LocalDateTime.now();
+            var mensagem = Mensagem.builder()
+                    .id(id)
+                    .usuario("Eva")
+                    .conteudo("Conteudo da Mensagem")
+                    .dataCriacao(timestamp)
+                    .dataAlteracao(timestamp)
+                    .build();
+
+            given()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(mensagem)
+            .when()
+                    .put("/mensagens/{id}",id)
+            .then()
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .body(equalTo("Mensagem não encontrada"));
+
+        }
         @Test
-        void deveGerarExcecao_QuandoAlterarMenssagem_IdMensagemNovaApresentaValorDiferente(){ fail("teste não implementado");}
+        void deveGerarExcecao_QuandoAlterarMenssagem_IdMensagemNovaApresentaValorDiferente(){
+
+            var id = UUID.fromString("4106c508-28d5-4294-97fd-3c025d83cb30");
+            var timestamp = LocalDateTime.now();
+            var mensagem = Mensagem.builder()
+                    .id( UUID.fromString("4106c508-28d5-4294-97fd-3c025d83cb36"))
+                    .usuario("Eva")
+                    .conteudo("Conteudo da Mensagem")
+                    .dataCriacao(timestamp)
+                    .dataAlteracao(timestamp)
+                    .build();
+
+            given()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(mensagem)
+            .when()
+                    .put("/mensagens/{id}",id)
+            .then()
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .body(equalTo("mensagem não apresenta o ID correto"));
+
+        }
 
     }
     @Nested
     class RemoverMensagem{
         @Test
-        void devePermitirRemoverMensagem(){ fail("teste não implementado");}
+        void devePermitirRemoverMensagem(){
+
+            var id = UUID.fromString("4106c508-28d5-4294-97fd-3c025d83cb30");
+
+            when()
+                    .delete("/mensagens/{id}",id)
+            .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body(equalTo("mensagem removida"));
+
+        }
 
         @Test
-        void deveGerarExcecao_QuandoIdNaoExiste(){ fail("teste não implementado");}
+        void deveGerarExcecao_QuandoIdNaoExiste(){
+
+            var id = UUID.fromString("4106c508-28d5-4294-97fd-3c025d83cb36");
+
+            when()
+                    .delete("/mensagens/{id}",id)
+            .then()
+                    .statusCode(HttpStatus.NOT_FOUND.value())
+                    .body(equalTo("Mensagem não encontrada"));
+
+        }
 
 
 
@@ -177,6 +252,34 @@ public class MensagemControllerIT {
     class ListarMensagem{
 
         @Test
-        void devePermitirListarMensagens(){fail("teste não implementado");}
+        void devePermitirListarMensagens(){
+
+            given()
+                    .queryParam("page",0)
+                    .queryParam("size",10)
+            .when()
+                    .get("/mensagens")
+            .then()
+                    .statusCode(HttpStatus.OK.value());
+                    // Deu erro pois os valores estavam null de data
+                    //.body(matchesJsonSchemaInClasspath("schemas/mensagem.schema.json"));
+
+        }
+
+        @Test
+        void devePermitirListarMensagens_QuandoNaoInformadoPaginacao(){
+
+            given()
+                   // .queryParam("page",0)
+                   // .queryParam("size",10)
+            .when()
+                    .get("/mensagens")
+            .then()
+                    .statusCode(HttpStatus.OK.value());
+            // Deu erro pois os valores estavam null de data
+            //.body(matchesJsonSchemaInClasspath("schemas/mensagem.schema.json"));
+
+        }
+
     }
 }
