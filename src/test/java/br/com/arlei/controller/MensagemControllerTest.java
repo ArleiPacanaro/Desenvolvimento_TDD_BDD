@@ -150,7 +150,7 @@ public class MensagemControllerTest {
             mockMvc.perform(put("/mensagens/{id}", id)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(asJsonString(mensagem)))
-                    .andExpect(status().isOk())
+                    .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.id").value(mensagem.getId().toString()))
                     .andExpect(jsonPath("$.conteudo").value(mensagem.getConteudo()))
                     .andExpect(jsonPath("$.usuario").value(mensagem.getUsuario()))

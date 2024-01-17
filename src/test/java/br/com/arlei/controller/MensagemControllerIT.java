@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 // Criar uma porta aleatória para o spring boot
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
+@ActiveProfiles("test")
 public class MensagemControllerIT {
 
     // Capturar a porta aleatória
@@ -132,11 +134,11 @@ public class MensagemControllerIT {
         @Test
         void devePermitirAlterarMensagem(){
 
-            var id = UUID.fromString("4106c508-28d5-4294-97fd-3c025d83cb30");
+            var id = UUID.fromString("4106c507-28d5-4294-97fd-3c025d83cb30");
             var timestamp = LocalDateTime.now();
             var mensagem = Mensagem.builder()
                     .id(id)
-                    .usuario("Eva")
+                    .usuario("Adam")
                     .conteudo("Conteudo da Mensagem")
                     .dataCriacao(timestamp)
                     .dataAlteracao(timestamp)

@@ -1,6 +1,5 @@
 server:
   port: 8080
-  shutdown: graceful
   servlet:
     encoding:
       charset: UTF-8
@@ -8,21 +7,13 @@ server:
       force: true
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    #    url: jdbc:h2:file:./target/h2.db;AUTO_SERVER=true
-    #    url: jdbc:h2:tcp://localhost:9092/mem:testdb
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    password: 1234
+    username: postgres
   jpa:
-    database: h2
-    database-platform: org.hibernate.dialect.H2Dialect
-    # Apenas para teste
-    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
-  sql:
-    init:
-      mode: always
-  lifecycle:
-    timeout-per-shutdown-phase: "5s"
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
